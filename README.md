@@ -1,9 +1,5 @@
 # 📋 Sistem E-Arsip Surat Hierarki
 
-![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.1-777BB4?style=for-the-badge&logo=php&logoColor=white)
-
 Aplikasi **E-Arsip Surat** untuk mengelola **Surat Masuk** dan **Surat Keluar** dengan alur kerja **hierarki jabatan** (Kabid → Kasi → Staff), fitur **disposisi berjenjang multi-target**, dan **monitoring status posisi surat** secara real-time.
 
 ---
