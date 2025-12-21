@@ -355,16 +355,7 @@ Proyek ini dibuat untuk kebutuhan **akademik dan demo**. Silakan gunakan dan mod
 
 Dikembangkan oleh [Suhastra13](https://github.com/suhastra13)
 
----
 
-## 📞 Support
-
-Jika ada pertanyaan atau issue:
-
--   🐛 [Report Bug](https://github.com/suhastra13/Sistem-arsip-surat-hierarki/issues)
--   💡 [Request Feature](https://github.com/suhastra13/Sistem-arsip-surat-hierarki/issues)
-
----
 
 <div align="center">
 
