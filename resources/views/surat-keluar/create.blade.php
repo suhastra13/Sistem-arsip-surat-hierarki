@@ -13,7 +13,6 @@
 <div class="row justify-content-center">
     <div class="col-lg-9 col-xl-8">
 
-        <!-- Workflow Info Card -->
         <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);">
             <div class="card-body p-4">
                 <div class="d-flex align-items-start">
@@ -43,7 +42,6 @@
             </div>
         </div>
 
-        <!-- Main Form Card -->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-gradient text-white py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="d-flex align-items-center">
@@ -79,7 +77,6 @@
                 <form action="{{ route('surat-keluar.store') }}" method="POST" enctype="multipart/form-data" id="suratForm">
                     @csrf
 
-                    <!-- Step 1: Tanggal -->
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2">
                             <span class="badge bg-primary rounded-circle me-2">1</span>
@@ -119,20 +116,31 @@
                         </div>
                     </div>
 
-                    <!-- Step 2: Perihal -->
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2">
                             <span class="badge bg-primary rounded-circle me-2">2</span>
+                            Jenis / Kategori Surat
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-list text-primary"></i>
+                            </span>
+                            <select name="kategori" class="form-select border-start-0 ps-0 form-select-lg" required style="font-size: 0.95rem;">
+                                <option value="" selected disabled>-- Pilih Kategori --</option>
+                                <option value="Laporan" {{ old('kategori') == 'Laporan' ? 'selected' : '' }}>Laporan</option>
+                                <option value="Surat Edaran" {{ old('kategori') == 'Surat Edaran' ? 'selected' : '' }}>Surat Edaran</option>
+                                <option value="Surat Tugas" {{ old('kategori') == 'Surat Tugas' ? 'selected' : '' }}>Surat Tugas</option>
+                                <option value="Undangan" {{ old('kategori') == 'Undangan' ? 'selected' : '' }}>Undangan</option>
+                                <option value="Berita Acara" {{ old('kategori') == 'Berita Acara' ? 'selected' : '' }}>Berita Acara</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">
+                            <span class="badge bg-primary rounded-circle me-2">3</span>
                             Perihal / Judul Surat
                         </label>
-                        <textarea name="perihal"
-                            id="perihalSurat"
-                            class="form-control form-control-lg"
-                            rows="4"
-                            placeholder="Contoh: Undangan Rapat Koordinasi Reboisasi Tahun 2025"
-                            required
-                            maxlength="500"
-                            style="resize: none;">{{ old('perihal') }}</textarea>
+                        <textarea name="perihal" id="perihalSurat" class="form-control form-control-lg" rows="4" placeholder="Contoh: Undangan Rapat Koordinasi Reboisasi Tahun 2025" required maxlength="500" style="resize: none;">{{ old('perihal') }}</textarea>
                         <div class="d-flex justify-content-between mt-2">
                             <div class="form-text">
                                 <i class="fas fa-lightbulb me-1"></i>
@@ -142,22 +150,14 @@
                         </div>
                     </div>
 
-                    <!-- Step 3: Upload File -->
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2">
-                            <span class="badge bg-primary rounded-circle me-2">3</span>
+                            <span class="badge bg-primary rounded-circle me-2">4</span>
                             Upload Dokumen Draft
                         </label>
 
-                        <div class="border-2 border-dashed rounded-3 p-4 text-center position-relative"
-                            style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;"
-                            id="uploadArea">
-                            <input type="file"
-                                name="file_surat"
-                                class="form-control d-none"
-                                accept=".pdf,.doc,.docx"
-                                required
-                                id="fileInput">
+                        <div class="border-2 border-dashed rounded-3 p-4 text-center position-relative" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;" id="uploadArea">
+                            <input type="file" name="file_surat" class="form-control d-none" accept=".pdf,.doc,.docx" required id="fileInput">
 
                             <label for="fileInput" class="d-block" style="cursor: pointer;">
                                 <div id="uploadPrompt">
@@ -170,7 +170,7 @@
                                         <span class="badge bg-light text-dark">DOC</span>
                                         <span class="badge bg-light text-dark">DOCX</span>
                                     </p>
-                                    <p class="text-muted small mb-0">Maksimal ukuran: 2MB</p>
+                                    <p class="text-muted small mb-0">Maksimal ukuran: 20MB</p>
                                 </div>
 
                                 <div id="fileInfo" class="d-none">
@@ -192,7 +192,6 @@
 
                     <hr class="my-4">
 
-                    <!-- Action Buttons -->
                     <div class="d-flex flex-column flex-sm-row gap-3 justify-content-between">
                         <a href="{{ route('surat-keluar.index') }}" class="btn btn-light border btn-lg">
                             <i class="fas fa-arrow-left me-2"></i>
@@ -207,24 +206,25 @@
                 </form>
             </div>
         </div>
-
-        <!-- Help Card -->
-        <div class="card border-0 bg-light mt-3">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-lightbulb text-warning fa-lg me-3 mt-1"></i>
-                    <div>
-                        <h6 class="fw-bold mb-1">Tips Pengisian</h6>
-                        <small class="text-muted">
-                            Pastikan semua informasi yang diisi sesuai dengan dokumen asli.
-                            Setelah disimpan, surat akan otomatis diteruskan ke Kepala Bidang untuk disposisi lebih lanjut.
-                        </small>
-                    </div>
-                </div>
+    </div>
+</div>
+<!-- Help Card -->
+<div class="card border-0 bg-light mt-3">
+    <div class="card-body p-3">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-lightbulb text-warning fa-lg me-3 mt-1"></i>
+            <div>
+                <h6 class="fw-bold mb-1">Tips Pengisian</h6>
+                <small class="text-muted">
+                    Pastikan semua informasi yang diisi sesuai dengan dokumen asli.
+                    Setelah disimpan, surat akan otomatis diteruskan ke Kepala Bidang untuk disposisi lebih lanjut.
+                </small>
             </div>
         </div>
-
     </div>
+</div>
+
+</div>
 </div>
 
 <!-- Flatpickr CSS -->

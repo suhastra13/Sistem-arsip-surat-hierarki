@@ -26,7 +26,7 @@
     <form action="{{ route('surat-keluar.index') }}" method="GET" id="filterForm">
         <div class="row g-3">
             <!-- Search -->
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <label class="form-label text-secondary mb-1">
                     <i class="fas fa-search me-1"></i>Pencarian
                 </label>
@@ -35,10 +35,62 @@
                     value="{{ request('search') }}">
             </div>
 
-            <!-- Status Filter -->
-            <div class="col-lg-3 col-md-6">
+            <!-- Tahun Filter -->
+            <div class="col-lg-2 col-md-4">
                 <label class="form-label text-secondary mb-1">
-                    <i class="fas fa-filter me-1"></i>Filter Status
+                    <i class="fas fa-calendar-alt me-1"></i>Tahun
+                </label>
+                <select name="tahun" class="form-select">
+                    <option value="">Semua Tahun</option>
+                    @for($year = date('Y'); $year >= date('Y') - 5; $year--)
+                    <option value="{{ $year }}" {{ request('tahun') == $year ? 'selected' : '' }}>
+                        {{ $year }}
+                    </option>
+                    @endfor
+                </select>
+            </div>
+
+            <!-- Bulan Filter -->
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label text-secondary mb-1">
+                    <i class="fas fa-calendar me-1"></i>Bulan
+                </label>
+                <select name="bulan" class="form-select">
+                    <option value="">Semua Bulan</option>
+                    <option value="01" {{ request('bulan') == '01' ? 'selected' : '' }}>Januari</option>
+                    <option value="02" {{ request('bulan') == '02' ? 'selected' : '' }}>Februari</option>
+                    <option value="03" {{ request('bulan') == '03' ? 'selected' : '' }}>Maret</option>
+                    <option value="04" {{ request('bulan') == '04' ? 'selected' : '' }}>April</option>
+                    <option value="05" {{ request('bulan') == '05' ? 'selected' : '' }}>Mei</option>
+                    <option value="06" {{ request('bulan') == '06' ? 'selected' : '' }}>Juni</option>
+                    <option value="07" {{ request('bulan') == '07' ? 'selected' : '' }}>Juli</option>
+                    <option value="08" {{ request('bulan') == '08' ? 'selected' : '' }}>Agustus</option>
+                    <option value="09" {{ request('bulan') == '09' ? 'selected' : '' }}>September</option>
+                    <option value="10" {{ request('bulan') == '10' ? 'selected' : '' }}>Oktober</option>
+                    <option value="11" {{ request('bulan') == '11' ? 'selected' : '' }}>November</option>
+                    <option value="12" {{ request('bulan') == '12' ? 'selected' : '' }}>Desember</option>
+                </select>
+            </div>
+
+            <!-- Kategori Filter -->
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label text-secondary mb-1">
+                    <i class="fas fa-tags me-1"></i>Kategori
+                </label>
+                <select name="kategori" class="form-select">
+                    <option value="">Semua Kategori</option>
+                    @foreach($kategoris as $kategori)
+                    <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
+                        {{ $kategori }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label text-secondary mb-1">
+                    <i class="fas fa-filter me-1"></i>Status
                 </label>
                 <select name="filter" class="form-select">
                     <option value="">Semua Status</option>
@@ -56,17 +108,18 @@
                     @endif
                 </select>
             </div>
+        </div>
 
-            <!-- Action Buttons -->
-            <div class="col-lg-3 col-md-6">
-                <label class="form-label opacity-0 mb-1">Action</label>
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <i class="fas fa-search"></i> Cari
+        <!-- Action Buttons -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Cari
                     </button>
-                    @if(request()->hasAny(['search', 'filter']))
-                    <a href="{{ route('surat-keluar.index') }}" class="btn btn-secondary" title="Reset">
-                        <i class="fas fa-redo"></i>
+                    @if(request()->hasAny(['search', 'filter', 'tahun', 'bulan', 'kategori']))
+                    <a href="{{ route('surat-keluar.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-redo me-1"></i> Reset
                     </a>
                     @endif
                 </div>
@@ -74,7 +127,7 @@
         </div>
 
         <!-- Active Filters -->
-        @if(request()->hasAny(['search', 'filter']))
+        @if(request()->hasAny(['search', 'filter', 'tahun', 'bulan', 'kategori']))
         <div class="mt-3 pt-3 border-top">
             <div class="d-flex align-items-center flex-wrap gap-2">
                 <strong class="text-primary me-2">
@@ -84,6 +137,30 @@
                 <span class="badge bg-primary">
                     <i class="fas fa-search me-1"></i>"{{ request('search') }}"
                     <a href="{{ route('surat-keluar.index', request()->except('search')) }}" class="text-white ms-2">×</a>
+                </span>
+                @endif
+                @if(request('tahun'))
+                <span class="badge bg-primary">
+                    <i class="fas fa-calendar-alt me-1"></i>Tahun {{ request('tahun') }}
+                    <a href="{{ route('surat-keluar.index', request()->except('tahun')) }}" class="text-white ms-2">×</a>
+                </span>
+                @endif
+                @if(request('bulan'))
+                <span class="badge bg-primary">
+                    <i class="fas fa-calendar me-1"></i>
+                    @php
+                    $bulanNames = ['01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+                    '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+                    '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'];
+                    @endphp
+                    {{ $bulanNames[request('bulan')] ?? request('bulan') }}
+                    <a href="{{ route('surat-keluar.index', request()->except('bulan')) }}" class="text-white ms-2">×</a>
+                </span>
+                @endif
+                @if(request('kategori'))
+                <span class="badge bg-primary">
+                    <i class="fas fa-tags me-1"></i>{{ request('kategori') }}
+                    <a href="{{ route('surat-keluar.index', request()->except('kategori')) }}" class="text-white ms-2">×</a>
                 </span>
                 @endif
                 @if(request('filter'))
@@ -114,6 +191,7 @@
                 <tr>
                     <th width="10%" class="text-white">Tanggal</th>
                     <th width="30%" class="text-white">Perihal Surat</th>
+                    <th width="15%" class="text-center text-white">Kategori</th>
                     <th width="15%" class="text-center text-white">Status Approval</th>
                     <th width="25%" class="text-white">Posisi Dokumen</th>
                     <th width="20%" class="text-center text-white">Aksi</th>
@@ -124,6 +202,9 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d/m/Y') }}</td>
                     <td>{{ Str::limit($item->perihal, 50) }}</td>
+                    <td class="text-center">
+                        <span class="badge bg-secondary">{{ $item->kategori ?? '-' }}</span>
+                    </td>
                     <td class="text-center">
                         @if($item->status_acc == 'acc')
                         <span class="badge bg-success">
@@ -174,18 +255,18 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                         <div class="text-muted">
                             <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
                             <h5>Tidak Ada Data</h5>
                             <p class="mb-0">
-                                @if(request()->hasAny(['search', 'filter']))
+                                @if(request()->hasAny(['search', 'filter', 'tahun', 'bulan', 'kategori']))
                                 Tidak ada surat yang sesuai dengan filter yang dipilih.
                                 @else
                                 Belum ada data surat keluar yang tersedia.
                                 @endif
                             </p>
-                            @if(request()->hasAny(['search', 'filter']))
+                            @if(request()->hasAny(['search', 'filter', 'tahun', 'bulan', 'kategori']))
                             <a href="{{ route('surat-keluar.index') }}" class="btn btn-primary btn-sm mt-3">
                                 <i class="fas fa-redo me-2"></i>Reset Filter
                             </a>
@@ -197,6 +278,13 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    @if($data->hasPages())
+    <div class="p-3 border-top">
+        {{ $data->appends(request()->query())->links() }}
+    </div>
+    @endif
 </div>
 
 <style>

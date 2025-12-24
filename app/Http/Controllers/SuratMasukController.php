@@ -85,6 +85,7 @@ class SuratMasukController extends Controller
         // 1. Validasi
         $request->validate([
             'nomor_surat' => 'required|unique:surat_masuk,nomor_surat',
+            'kategori' => 'required',
             'tanggal_surat' => 'required|date',
             'pengirim' => 'required',
             'perihal' => 'required',
@@ -97,6 +98,7 @@ class SuratMasukController extends Controller
         // SIMPAN SURAT
         $surat = SuratMasuk::create([
             'nomor_surat' => $request->nomor_surat,
+            'kategori' => $request->kategori,
             'tanggal_surat' => $request->tanggal_surat,
             'pengirim' => $request->pengirim,
             'perihal' => $request->perihal,

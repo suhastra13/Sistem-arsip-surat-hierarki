@@ -40,7 +40,6 @@
                 <form action="{{ route('surat-masuk.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
-                    <!-- Section: Identitas Surat -->
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
@@ -107,7 +106,6 @@
 
                     <hr class="my-4">
 
-                    <!-- Section: Detail Surat -->
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-success bg-opacity-10 rounded-circle p-2 me-2">
@@ -116,6 +114,25 @@
                             <h6 class="mb-0 fw-bold text-success">Detail Surat</h6>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-tag text-success me-2"></i>Kategori Surat
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-list text-muted"></i>
+                                </span>
+                                <select name="kategori" class="form-select border-start-0 ps-0" required>
+                                    <option value="" selected disabled>-- Pilih Kategori --</option>
+                                    <option value="Laporan" {{ old('kategori') == 'Laporan' ? 'selected' : '' }}>Laporan</option>
+                                    <option value="Surat Edaran" {{ old('kategori') == 'Surat Edaran' ? 'selected' : '' }}>Surat Edaran</option>
+                                    <option value="Surat Tugas" {{ old('kategori') == 'Surat Tugas' ? 'selected' : '' }}>Surat Tugas</option>
+                                    <option value="Undangan" {{ old('kategori') == 'Undangan' ? 'selected' : '' }}>Undangan</option>
+                                    <option value="Berita Acara" {{ old('kategori') == 'Berita Acara' ? 'selected' : '' }}>Berita Acara</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
                                 <i class="fas fa-building text-success me-2"></i>Instansi Pengirim
@@ -144,7 +161,6 @@
 
                     <hr class="my-4">
 
-                    <!-- Section: Upload Dokumen -->
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-2">
@@ -166,7 +182,7 @@
                                     <h6 class="fw-bold mb-2">Klik untuk memilih file</h6>
                                     <p class="text-muted mb-0">atau drag & drop file di sini</p>
                                     <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle me-1"></i>Format: PDF, DOC, DOCX | Maksimal: 2MB
+                                        <i class="fas fa-info-circle me-1"></i>Format: PDF, DOC, DOCX | Maksimal: 20MB
                                     </small>
                                 </div>
                                 <div id="fileInfo" class="d-none">
@@ -183,7 +199,6 @@
 
                     <hr class="my-4">
 
-                    <!-- Action Buttons -->
                     <div class="d-flex justify-content-between align-items-center pt-2">
                         <a href="{{ route('surat-masuk.index') }}" class="btn btn-light border px-4">
                             <i class="fas fa-arrow-left me-2"></i>Batal
@@ -197,7 +212,6 @@
             </div>
         </div>
 
-        <!-- Info Card -->
         <div class="card border-0 shadow-sm mt-3 bg-light">
             <div class="card-body py-3">
                 <div class="d-flex align-items-start">
@@ -205,7 +219,7 @@
                     <div>
                         <h6 class="fw-bold mb-1">Tips Pengisian</h6>
                         <small class="text-muted">
-                            Pastikan semua informasi yang diisi sesuai dengan dokumen asli.
+                            Pastikan memilih <b>Kategori Surat</b> yang sesuai agar memudahkan dalam pencarian arsip.
                             Setelah disimpan, surat akan otomatis diteruskan ke Kepala Bidang untuk disposisi lebih lanjut.
                         </small>
                     </div>
@@ -214,7 +228,6 @@
         </div>
     </div>
 </div>
-
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
 

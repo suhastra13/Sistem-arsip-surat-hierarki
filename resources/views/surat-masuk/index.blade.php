@@ -156,6 +156,7 @@
                     <th width="5%" class="text-center text-white">No</th>
                     <th width="15%" class="text-white">Nomor Surat</th>
                     <th width="20%" class="text-white">Pengirim</th>
+                    <th width="15%" class="text-white">Kategori</th>
                     <th width="25%" class="text-white">Perihal</th>
                     <th width="10%" class="text-center text-white">File</th>
                     <th width="15%" class="text-center text-white">Status</th>
@@ -179,6 +180,10 @@
                             <span>{{ $item->pengirim }}</span>
                         </div>
                     </td>
+                    <td>
+                        <span class="d-flex align-items-start">{{ $item->kategori }}</span>
+                    </td>
+
                     <td>{{ Str::limit($item->perihal, 70) }}</td>
                     <td class="text-center">
                         <a href="{{ asset('storage/' . $item->file_path) }}"
