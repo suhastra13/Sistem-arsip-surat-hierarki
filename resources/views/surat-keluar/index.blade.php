@@ -189,26 +189,27 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-primary">
                 <tr>
-                    <th width="10%" class="text-white">Tanggal</th>
-                    <th width="30%" class="text-white">Perihal Surat</th>
-                    <th width="15%" class="text-center text-white">Kategori</th>
-                    <th width="15%" class="text-center text-white">Status Approval</th>
-                    <th width="25%" class="text-white">Posisi Dokumen</th>
-                    <th width="20%" class="text-center text-white">Aksi</th>
+                    <th width="8%" class="text-white">Tanggal</th>
+                    <th width="20%" class="text-white">Perihal Surat</th>
+                    <th width="10%" class="text-center text-white">Kategori</th>
+                    <th width="10%" class="text-center text-white">Status</th>
+                    <th width="17%" class="text-white">Posisi Dokumen</th>
+                    <th width="20%" class="text-white">History Approval</th>
+                    <th width="15%" class="text-center text-white">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($data as $item)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d/m/Y') }}</td>
-                    <td>{{ Str::limit($item->perihal, 50) }}</td>
+                    <td>{{ Str::limit($item->perihal, 40) }}</td>
                     <td class="text-center">
                         <span class="badge bg-secondary">{{ $item->kategori ?? '-' }}</span>
                     </td>
                     <td class="text-center">
                         @if($item->status_acc == 'acc')
                         <span class="badge bg-success">
-                            <i class="fas fa-check-circle me-1"></i>Disetujui
+                            <i class="fas fa-check-circle me-1"></i>ACC
                         </span>
                         @elseif($item->status_acc == 'revisi')
                         <span class="badge bg-warning text-dark">
@@ -216,7 +217,7 @@
                         </span>
                         @elseif($item->status_acc == 'ditolak')
                         <span class="badge bg-danger">
-                            <i class="fas fa-ban me-1"></i>Ditolak
+                            <i class="fas fa-ban me-1"></i>Tolak
                         </span>
                         @else
                         <span class="badge bg-secondary">
@@ -237,6 +238,63 @@
                         <span class="text-muted small">Arsip / Selesai</span>
                         @endif
                     </td>
+                    <td>
+                        <!-- History Timeline -->
+                        <div class="history-timeline">
+                            @php
+                            $histories = $item->logs ?? collect();
+                            @endphp
+
+                            @if($histories->isEmpty())
+                            <span class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>Belum ada history
+                            </span>
+                            @else
+                            @foreach($histories->take(2) as $history)
+                            <div class="history-item mb-2">
+                                <div class="d-flex align-items-start">
+                                    @if($history->aksi == 'acc')
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    @elseif($history->aksi == 'revisi')
+                                    <i class="fas fa-edit text-warning me-2 mt-1"></i>
+                                    @elseif($history->aksi == 'ditolak')
+                                    <i class="fas fa-times-circle text-danger me-2 mt-1"></i>
+                                    @else
+                                    <i class="fas fa-arrow-right text-info me-2 mt-1"></i>
+                                    @endif
+
+                                    <div class="flex-grow-1">
+                                        <div class="small fw-semibold">{{ $history->pengirim->name ?? '-' }}</div>
+                                        <div class="text-muted" style="font-size: 0.7rem;">
+                                            {{ $history->pengirim->jabatan ?? '-' }}
+                                            @if($history->aksi == 'acc')
+                                            <span class="text-success">✓ Setuju</span>
+                                            @elseif($history->aksi == 'revisi')
+                                            <span class="text-warning">⟳ Revisi</span>
+                                            @elseif($history->aksi == 'ditolak')
+                                            <span class="text-danger">✗ Tolak</span>
+                                            @else
+                                            <span class="text-info">{{ ucfirst($history->aksi) }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.65rem;">
+                                            {{ \Carbon\Carbon::parse($history->created_at)->format('d/m/y H:i') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+
+                            @if($histories->count() > 2)
+                            <button type="button" class="btn btn-link btn-sm p-0 text-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#historyModal{{ $item->id }}">
+                                <i class="fas fa-plus-circle me-1"></i>Lihat {{ $histories->count() - 2 }} lainnya
+                            </button>
+                            @endif
+                            @endif
+                        </div>
+                    </td>
                     <td class="text-center">
                         @if(Auth::id() == $item->posisi_saat_ini && Auth::id() != $item->pembuat_id)
                         <a href="{{ route('surat-keluar.show', $item->id) }}" class="btn btn-sm btn-primary pulse-button">
@@ -253,9 +311,74 @@
                         @endif
                     </td>
                 </tr>
+
+                <!-- Modal Full History -->
+                @if($histories->count() > 2)
+                <div class="modal fade" id="historyModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h6 class="modal-title mb-0">
+                                    <i class="fas fa-history me-2"></i>Riwayat Lengkap Approval
+                                </h6>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-2">
+                                    <strong class="text-primary">Perihal:</strong> {{ $item->perihal }}
+                                </div>
+                                <hr>
+                                @foreach($histories as $history)
+                                <div class="history-item-full mb-3 p-3 border rounded">
+                                    <div class="d-flex align-items-start">
+                                        @if($history->aksi == 'acc')
+                                        <div class="badge bg-success me-3 mt-1">✓</div>
+                                        @elseif($history->aksi == 'revisi')
+                                        <div class="badge bg-warning me-3 mt-1">⟳</div>
+                                        @elseif($history->aksi == 'ditolak')
+                                        <div class="badge bg-danger me-3 mt-1">✗</div>
+                                        @else
+                                        <div class="badge bg-info me-3 mt-1">→</div>
+                                        @endif
+
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">{{ $history->pengirim->name ?? '-' }}</div>
+                                            <div class="text-muted small">{{ $history->pengirim->jabatan ?? '-' }}</div>
+                                            <div class="mt-2">
+                                                <span class="badge 
+                                                    @if($history->aksi == 'acc') bg-success
+                                                    @elseif($history->aksi == 'revisi') bg-warning text-dark
+                                                    @elseif($history->aksi == 'ditolak') bg-danger
+                                                    @else bg-info
+                                                    @endif">
+                                                    {{ ucfirst($history->aksi) }}
+                                                </span>
+                                            </div>
+                                            @if($history->catatan_revisi)
+                                            <div class="mt-2 small text-muted">
+                                                <strong>Catatan:</strong> {{ $history->catatan_revisi }}
+                                            </div>
+                                            @endif
+                                            <div class="mt-2 text-muted" style="font-size: 0.75rem;">
+                                                <i class="far fa-clock me-1"></i>
+                                                {{ \Carbon\Carbon::parse($history->created_at)->format('d M Y, H:i') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5">
+                    <td colspan="7" class="text-center py-5">
                         <div class="text-muted">
                             <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
                             <h5>Tidak Ada Data</h5>
@@ -347,6 +470,7 @@
     .table tbody td {
         padding: 0.85rem 0.75rem;
         border-color: #e9ecef;
+        vertical-align: top;
     }
 
     .table-hover tbody tr {
@@ -355,6 +479,25 @@
 
     .table-hover tbody tr:hover {
         background-color: rgba(0, 64, 133, 0.05);
+    }
+
+    /* History Timeline */
+    .history-timeline {
+        max-width: 100%;
+    }
+
+    .history-item {
+        padding-left: 0;
+        border-left: 2px solid #e9ecef;
+        padding-left: 10px;
+    }
+
+    .history-item:last-child {
+        border-left: none;
+    }
+
+    .history-item-full {
+        background: #f8f9fa;
     }
 
     /* Badge */
@@ -392,6 +535,15 @@
         background: linear-gradient(135deg, #003266 0%, #004085 100%);
     }
 
+    .btn-link {
+        text-decoration: none;
+        font-size: 0.75rem;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
     /* Pulse Animation for Validation Button */
     .pulse-button {
         animation: pulse 2s infinite;
@@ -411,10 +563,19 @@
         }
     }
 
+    /* Modal */
+    .modal-header {
+        background: linear-gradient(135deg, #004085 0%, #0056b3 100%);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .table {
-            font-size: 0.813rem;
+            font-size: 0.75rem;
+        }
+
+        .history-item {
+            font-size: 0.7rem;
         }
     }
 </style>

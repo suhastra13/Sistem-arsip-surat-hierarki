@@ -41,11 +41,12 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-primary">
                 <tr>
-                    <th width="25%" class="text-white">Dari</th>
-                    <th width="30%" class="text-white">Perihal Surat</th>
-                    <th width="25%" class="text-white">Instruksi</th>
+                    <th width="20%" class="text-white">Dari</th>
+                    <th width="25%" class="text-white">Perihal Surat</th>
+                    <th width="20%" class="text-white">Instruksi</th>
+                    <th width="10%" class="text-center text-white">File</th>
                     <th width="10%" class="text-center text-white">Status</th>
-                    <th width="10%" class="text-center text-white">Aksi</th>
+                    <th width="15%" class="text-center text-white">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +79,20 @@
                         </div>
                     </td>
                     <td class="text-center">
+                        @if($item->surat->file_path)
+                        <a href="{{ asset('storage/' . $item->surat->file_path) }}"
+                            target="_blank"
+                            class="btn btn-sm btn-danger"
+                            title="Lihat File Surat">
+                            <i class="fas fa-file-pdf me-1"></i>PDF
+                        </a>
+                        @else
+                        <span class="text-muted small">
+                            <i class="fas fa-minus"></i>
+                        </span>
+                        @endif
+                    </td>
+                    <td class="text-center">
                         @if($item->is_read)
                         <span class="badge bg-success">
                             <i class="fas fa-check-double me-1"></i>Dibaca
@@ -89,20 +104,190 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        @if($item->status == 'pending')
-                        <a href="{{ route('disposisi.show', $item->id) }}" class="btn btn-sm btn-primary">
-                            <i class="fas fa-folder-open me-1"></i>Buka
-                        </a>
-                        @else
-                        <span class="badge bg-light text-success border border-success">
-                            <i class="fas fa-check-circle me-1"></i>Selesai
-                        </span>
-                        @endif
+                        <div class="btn-group" role="group">
+                            <!-- Tombol Lihat Detail -->
+                            <button type="button" class="btn btn-sm btn-info text-white"
+                                data-bs-toggle="modal"
+                                data-bs-target="#detailModal{{ $item->id }}">
+                                <i class="fas fa-eye me-1"></i>Detail
+                            </button>
+
+                            @if($item->status == 'pending')
+                            <a href="{{ route('disposisi.show', $item->id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-folder-open me-1"></i>Buka
+                            </a>
+                            @else
+                            <span class="badge bg-light text-success border border-success ms-1">
+                                <i class="fas fa-check-circle me-1"></i>Selesai
+                            </span>
+                            @endif
+                        </div>
                     </td>
                 </tr>
+
+                <!-- Modal Detail untuk setiap item -->
+                <div class="modal fade" id="detailModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-info-circle me-2"></i>Detail Disposisi
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Info Pengirim -->
+                                <div class="detail-section mb-4">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-user-tie text-primary me-2"></i>Informasi Pengirim
+                                    </h6>
+                                    <div class="detail-content">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Nama</label>
+                                                <div class="detail-value">{{ $item->pengirim->name }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Jabatan</label>
+                                                <div class="detail-value">{{ $item->pengirim->jabatan }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Email</label>
+                                                <div class="detail-value">{{ $item->pengirim->email }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Tanggal Disposisi</label>
+                                                <div class="detail-value">
+                                                    <i class="fas fa-calendar-alt text-muted me-1"></i>
+                                                    {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Info Surat -->
+                                <div class="detail-section mb-4">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-envelope-open-text text-primary me-2"></i>Informasi Surat
+                                    </h6>
+                                    <div class="detail-content">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Nomor Surat</label>
+                                                <div class="detail-value fw-bold text-primary">{{ $item->surat->nomor_surat }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Tanggal Surat</label>
+                                                <div class="detail-value">
+                                                    {{ \Carbon\Carbon::parse($item->surat->tanggal_surat)->format('d M Y') }}
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <label class="detail-label">Perihal</label>
+                                                <div class="detail-value">{{ $item->surat->perihal }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Pengirim Surat</label>
+                                                <div class="detail-value">{{ $item->surat->pengirim }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Sifat Surat</label>
+                                                <div class="detail-value">
+                                                    <span class="badge bg-{{ $item->surat->sifat == 'Sangat Segera' ? 'danger' : ($item->surat->sifat == 'Segera' ? 'warning' : 'info') }}">
+                                                        {{ $item->surat->sifat }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Instruksi Disposisi -->
+                                <div class="detail-section mb-3">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-tasks text-primary me-2"></i>Instruksi Disposisi
+                                    </h6>
+                                    <div class="detail-content">
+                                        <div class="instruction-detail-box">
+                                            <i class="fas fa-quote-left text-muted mb-2"></i>
+                                            <p class="mb-0 fst-italic">{{ $item->instruksi }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="detail-section">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>Status
+                                    </h6>
+                                    <div class="detail-content">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Status Baca</label>
+                                                <div>
+                                                    @if($item->is_read)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-double me-1"></i>Sudah Dibaca
+                                                    </span>
+                                                    @else
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-envelope me-1"></i>Belum Dibaca
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="detail-label">Status Disposisi</label>
+                                                <div>
+                                                    @if($item->status == 'pending')
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-clock me-1"></i>Pending
+                                                    </span>
+                                                    @else
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Selesai
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- File Surat (jika ada) -->
+                                @if($item->surat->file_path)
+                                <div class="detail-section mt-3">
+                                    <h6 class="section-title">
+                                        <i class="fas fa-file-pdf text-primary me-2"></i>Lampiran
+                                    </h6>
+                                    <div class="detail-content">
+                                        <a href="{{ asset('storage/' . $item->surat->file_path) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-danger">
+                                            <i class="fas fa-file-pdf me-1"></i>Lihat File Surat (PDF)
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Tutup
+                                </button>
+                                @if($item->status == 'pending')
+                                <a href="{{ route('disposisi.show', $item->id) }}" class="btn btn-primary">
+                                    <i class="fas fa-folder-open me-1"></i>Buka & Proses
+                                </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                         <div class="empty-state">
                             <i class="fas fa-inbox fa-4x mb-3 opacity-25"></i>
                             <h5 class="text-muted">Kotak Masuk Kosong</h5>
@@ -193,7 +378,6 @@
     }
 
     .inbox-row:hover {
-
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
@@ -235,7 +419,6 @@
     }
 
     .btn:hover {
-
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
@@ -253,6 +436,15 @@
         background: linear-gradient(135deg, #003266 0%, #004085 100%);
     }
 
+    .btn-info {
+        background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+        border: none;
+    }
+
+    .btn-info:hover {
+        background: linear-gradient(135deg, #0aa2c0 0%, #088a9e 100%);
+    }
+
     /* Empty State */
     .empty-state {
         padding: 2rem 0;
@@ -264,6 +456,53 @@
 
     /* Alert */
     .alert {
+        border-radius: 6px;
+    }
+
+    /* Modal Styles */
+    .modal-header {
+        background: linear-gradient(135deg, #004085 0%, #0056b3 100%);
+    }
+
+    .detail-section {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .detail-content {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .detail-value {
+        font-size: 0.875rem;
+        color: #212529;
+        font-weight: 500;
+    }
+
+    .instruction-detail-box {
+        background: #fff8e1;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
         border-radius: 6px;
     }
 
@@ -282,6 +521,15 @@
         .instruction-box {
             font-size: 0.75rem;
             padding: 0.375rem 0.5rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .btn-group .btn {
+            width: 100%;
         }
     }
 </style>

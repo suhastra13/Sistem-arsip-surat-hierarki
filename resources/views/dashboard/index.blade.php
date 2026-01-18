@@ -352,6 +352,8 @@
 
 <!-- Bottom Stats -->
 <div class="row g-3 mt-2">
+    @if(Auth::user()->role == 'admin')
+    <!-- Card Pengguna Aktif - Hanya untuk Admin -->
     <div class="col-md-4">
         <a href="{{ route('users.index') }}" class="text-decoration-none">
             <div class="card border-0 shadow-sm h-100 card-hover">
@@ -362,7 +364,7 @@
                         </div>
                         <div>
                             <h4 class="fw-bold mb-0 text-dark">{{ $total_user }}</h4>
-                            <small class="text-muted fw-semibold text-uppercase" style="font-size: 0.7rem;">Pegawai Aktif</small>
+                            <small class="text-muted fw-semibold text-uppercase" style="font-size: 0.7rem;">Pengguna Aktif</small>
                         </div>
                     </div>
                 </div>
@@ -379,18 +381,34 @@
                 <div>
                     <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">Ringkasan Produktivitas</h6>
                     <p class="text-muted small mb-0" style="font-size: 0.75rem;">
+                        Efisiensi sistem: <strong class="text-success">{{ $total_user }}</strong> pengguna mengelola <strong class="text-primary">{{ $sm_total + $sk_total }}</strong> dokumen
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
+    <!-- Card Full Width untuk Non-Admin -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm h-100" style="background-color: #f8f9fa;">
+            <div class="card-body p-3 d-flex align-items-center">
+                <div class="bg-white rounded-circle p-2 shadow-sm me-3">
+                    <i class="fas fa-chart-line fa-lg text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">Ringkasan Produktivitas</h6>
+                    <p class="text-muted small mb-0" style="font-size: 0.75rem;">
                         @if(Auth::user()->role == 'staff')
                         Tingkat penyelesaian: <strong class="text-success">{{ $sm_total > 0 ? round(($sm_selesai / $sm_total) * 100) : 0 }}%</strong>
                         @elseif(in_array(Auth::user()->role, ['kabid', 'kasi']))
                         Total keputusan: <strong class="text-primary">{{ $sk_acc + $sk_revisi + $sk_ditolak }}</strong> surat telah diproses
-                        @else
-                        Efisiensi sistem: <strong class="text-success">{{ $total_user }}</strong> user mengelola <strong class="text-primary">{{ $sm_total + $sk_total }}</strong> dokumen
                         @endif
                     </p>
                 </div>
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 <style>

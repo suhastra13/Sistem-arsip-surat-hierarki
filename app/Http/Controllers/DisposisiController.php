@@ -10,23 +10,23 @@ use Illuminate\Support\Facades\Auth;
 class DisposisiController extends Controller
 {
     // 1. INBOX (Kotak Masuk Disposisi Saya)
-    public function index(Request $request) // Tambahkan Request $request
+    public function index(Request $request)
     {
         // Ambil disposisi KHUSUS untuk user yang login
         $query = \App\Models\DisposisiSurat::where('penerima_id', Auth::id())->latest();
 
-        // --- TAMBAHAN: LOGIKA FILTER DARI DASHBOARD ---
+        // --- LOGIKA FILTER DARI DASHBOARD ---
         if ($request->filter == 'unread') {
             $query->where('is_read', 0); // Hanya yang belum dibaca
         } elseif ($request->filter == 'read') {
             $query->where('is_read', 1); // Hanya yang sudah dibaca
         }
-        // ----------------------------------------------
 
-        $inbox = $query->get();
+        // ✅ PERBAIKAN: EAGER LOADING untuk menghindari N+1 Problem
+        // Load relasi surat dan pengirim sekaligus
+        $inbox = $query->with(['surat', 'pengirim'])->get();
 
         // Hitung juga bawahan (jika user adalah pimpinan) untuk fitur kirim disposisi
-        // Logika bawahan biarkan seperti sebelumnya
         $user = Auth::user();
         $bawahan = collect();
         if ($user->role == 'kabid') {
@@ -39,8 +39,6 @@ class DisposisiController extends Controller
     }
 
     // 2. BACA DETAIL & BUKA KUNCI TOMBOL (Mark as Read)
-    // File: app/Http/Controllers/DisposisiController.php
-
     public function show($id)
     {
         $disposisi = DisposisiSurat::findOrFail($id);
@@ -119,12 +117,10 @@ class DisposisiController extends Controller
         // UPDATE STATUS DISPOSISI SAYA JADI SELESAI
         $disposisiSaatIni->update(['status' => 'selesai']);
 
-        // --- PERBAIKAN UTAMA: UPDATE STATUS DI TABEL SURAT MASUK ---
-        // Agar Admin & User lain tahu posisi suratnya sudah pindah
+        // UPDATE STATUS DI TABEL SURAT MASUK
         if ($posisiBaru != '') {
             $suratMasuk->update(['status_akhir' => $posisiBaru]);
         }
-        // -----------------------------------------------------------
 
         $jumlahPenerima = count($request->tujuan_id);
         return redirect()->route('disposisi.index')
